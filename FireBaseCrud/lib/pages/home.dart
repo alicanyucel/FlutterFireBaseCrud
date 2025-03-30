@@ -1,3 +1,4 @@
+import 'package:firebasecrud/employee/employee.dart';
 import 'package:flutter/material.dart';
 
 class Home extends StatefulWidget {
@@ -11,27 +12,22 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton:FloatingActionButton(onPressed:(){},child:Icon(Icons.add),),
+      floatingActionButton:FloatingActionButton(onPressed:(){
+        Navigator.push(context, MaterialPageRoute(builder: (context)=>Employee()));
+      },child:Icon(Icons.add),),
       appBar: AppBar(
         title: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              "Flutter",
+              "Flutter Firebase Crud Ali Can",
               style: TextStyle(
                 color: Colors.blue,
                 fontSize: 20.0,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            Text(
-              " Firebase Crud Alican",
-              style: TextStyle(
-                color: Colors.orange,
-                fontSize: 24.0,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+
           ],
         ),
       ),

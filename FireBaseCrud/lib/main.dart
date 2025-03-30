@@ -1,11 +1,34 @@
 import 'package:firebasecrud/employee/employee.dart';
-import 'package:firebasecrud/pages/home.dart';
 import 'package:flutter/material.dart';
-
-void main() {
+import 'package:sqflite/sqflite.dart';
+import 'package:path/path.dart';
+import 'package:firebasecrud/services/database.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  try {
+    DatabaseHelper dbHelper = DatabaseHelper();
+    await dbHelper.database;
+    Fluttertoast.showToast(
+      msg: "Veritabanı başarıyla başlatıldı!",
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.BOTTOM,
+      backgroundColor: Colors.green,
+      textColor: Colors.white,
+      fontSize: 16.0,
+    );
+  } catch (e) {
+    Fluttertoast.showToast(
+      msg: "Veritabanı başlatılamadı: $e",
+      toastLength: Toast.LENGTH_LONG,
+      gravity: ToastGravity.BOTTOM,
+      backgroundColor: Colors.red,
+      textColor: Colors.white,
+      fontSize: 16.0,
+    );
+  }
   runApp(const MyApp());
 }
-
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 

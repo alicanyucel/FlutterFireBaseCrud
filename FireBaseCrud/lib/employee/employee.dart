@@ -2,15 +2,17 @@ import 'package:firebasecrud/services/database.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+
 class Employee extends StatefulWidget {
   @override
   State<Employee> createState() => _EmployeeState();
 }
 
 class _EmployeeState extends State<Employee> {
-  TextEditingController namecontroller=new TextEditingController();
-  TextEditingController lastnamecontroller=new TextEditingController();
-  TextEditingController addresscontroller=new TextEditingController();
+  TextEditingController namecontroller = TextEditingController();
+  TextEditingController lastnamecontroller = TextEditingController();
+  TextEditingController addresscontroller = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -34,11 +36,12 @@ class _EmployeeState extends State<Employee> {
       ),
       body: SingleChildScrollView(
         child: Container(
-          margin: const EdgeInsets.only(left: 20.0, top: 30.0, right: 20.0, bottom: 30.0),
+          margin: const EdgeInsets.only(
+              left: 20.0, top: 30.0, right: 20.0, bottom: 30.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-               Text(
+              Text(
                 "İsim",
                 style: TextStyle(
                   color: Colors.black,
@@ -75,7 +78,7 @@ class _EmployeeState extends State<Employee> {
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: TextField(
-                  controller:lastnamecontroller ,
+                  controller: lastnamecontroller,
                   decoration: InputDecoration(border: InputBorder.none),
                 ),
               ),
@@ -95,8 +98,8 @@ class _EmployeeState extends State<Employee> {
                   border: Border.all(),
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child:TextField(
-                  controller:addresscontroller,
+                child: TextField(
+                  controller: addresscontroller,
                   decoration: InputDecoration(border: InputBorder.none),
                 ),
               ),
@@ -104,23 +107,36 @@ class _EmployeeState extends State<Employee> {
               Center(
                 child: ElevatedButton(
                   onPressed: () async {
-                    final employee = EmployeeModel(
-                      firstName: namecontroller.text,
-                      lastName: lastnamecontroller.text,
-                      address: addresscontroller.text,
-                    );
-                    await DatabaseHelper().insertEmployee(employee);
-                    print("Veritabanına eklenen çalışan: ${employee.toMap()}");
+                    try {
+                      final employee = EmployeeModel(
+                        firstName: namecontroller.text,
+                        lastName: lastnamecontroller.text,
+                        address: addresscontroller.text,
+                      );
+                      await DatabaseHelper().insertEmployee(employee);
+                      print("Veritabanına eklenen çalışan: ${employee.toMap()}");
 
-                    Fluttertoast.showToast(
-                      msg: "Çalışan başarıyla eklendi!",
-                      toastLength:  Toast.LENGTH_SHORT,
-                      gravity: ToastGravity.BOTTOM,
-                      timeInSecForIosWeb: 1,
-                      backgroundColor: Colors.green,
-                      textColor: Colors.white,
-                      fontSize: 16.0,
-                    );
+                      Fluttertoast.showToast(
+                        msg: "Çalışan başarıyla eklendi!",
+                        toastLength: Toast.LENGTH_SHORT,
+                        gravity: ToastGravity.BOTTOM,
+                        timeInSecForIosWeb: 1,
+                        backgroundColor: Colors.green,
+                        textColor: Colors.white,
+                        fontSize: 16.0,
+                      );
+                    } catch (e) {
+                      Fluttertoast.showToast(
+                        msg: "Bir hata oluştu: $e",
+                        toastLength: Toast.LENGTH_LONG,
+                        gravity: ToastGravity.BOTTOM,
+                        timeInSecForIosWeb: 2,
+                        backgroundColor: Colors.red,
+                        textColor: Colors.white,
+                        fontSize: 16.0,
+                      );
+                      print("Hata: $e");
+                    }
                   },
                   child: Row(
                     mainAxisSize: MainAxisSize.min,

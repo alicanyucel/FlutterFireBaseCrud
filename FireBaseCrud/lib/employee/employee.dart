@@ -1,7 +1,7 @@
 import 'package:firebasecrud/services/database.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-
+import 'package:fluttertoast/fluttertoast.dart';
 class Employee extends StatefulWidget {
   @override
   State<Employee> createState() => _EmployeeState();
@@ -112,8 +112,14 @@ class _EmployeeState extends State<Employee> {
                     await DatabaseHelper().insertEmployee(employee);
                     print("Veritabanına eklenen çalışan: ${employee.toMap()}");
 
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Çalışan başarıyla eklendi!')),
+                    Fluttertoast.showToast(
+                      msg: "Çalışan başarıyla eklendi!",
+                      toastLength:  Toast.LENGTH_SHORT,
+                      gravity: ToastGravity.BOTTOM,
+                      timeInSecForIosWeb: 1,
+                      backgroundColor: Colors.green,
+                      textColor: Colors.white,
+                      fontSize: 16.0,
                     );
                   },
                   child: Row(

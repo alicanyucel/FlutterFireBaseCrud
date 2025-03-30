@@ -2,13 +2,13 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'dart:async';
 
-class User {
+class Employee {
   int? id;
   String firstName;
   String lastName;
   String address;
 
-  User({this.id, required this.firstName, required this.lastName, required this.address});
+  Employee({this.id, required this.firstName, required this.lastName, required this.address});
 
   Map<String, dynamic> toMap() {
     return {
@@ -19,8 +19,8 @@ class User {
     };
   }
 
-  factory User.fromMap(Map<String, dynamic> map) {
-    return User(
+  factory Employee.fromMap(Map<String, dynamic> map) {
+    return Employee(
       id: map['id'],
       firstName: map['firstName'],
       lastName: map['lastName'],
@@ -43,55 +43,55 @@ class DatabaseHelper {
   }
 
   Future<Database> _initDB() async {
-    final path = join(await getDatabasesPath(), 'user_database.db');
+    final path = join(await getDatabasesPath(), 'employee_database.db');
     return await openDatabase(path, version: 1, onCreate: (db, version) {
       return db.execute(
-        'CREATE TABLE users(id INTEGER PRIMARY KEY AUTOINCREMENT, firstName TEXT, lastName TEXT, address TEXT)',
+        'CREATE TABLE employees(id INTEGER PRIMARY KEY AUTOINCREMENT, firstName TEXT, lastName TEXT, address TEXT)',
       );
     });
   }
 
-  Future<void> insertUser(User user) async {
+  Future<void> insertEmployee(Employee employee) async {
     final db = await database;
-    await db.insert('users', user.toMap(), conflictAlgorithm: ConflictAlgorithm.replace);
+    await db.insert('employees', employee.toMap(), conflictAlgorithm: ConflictAlgorithm.replace);
   }
 
-  Future<void> updateUser(User user) async {
+  Future<void> updateEmployee(Employee employee) async {
     final db = await database;
     await db.update(
-      'users',
-      user.toMap(),
+      'employees',
+      employee.toMap(),
       where: 'id = ?',
-      whereArgs: [user.id],
+      whereArgs: [employee.id],
     );
   }
 
-  Future<void> deleteUser(int id) async {
+  Future<void> deleteEmployee(int id) async {
     final db = await database;
     await db.delete(
-      'users',
+      'employees',
       where: 'id = ?',
       whereArgs: [id],
     );
   }
 
-  Future<List<User>> getUsers() async {
+  Future<List<Employee>> getEmployees() async {
     final db = await database;
-    final List<Map<String, dynamic>> maps = await db.query('users');
+    final List<Map<String, dynamic>> maps = await db.query('employees');
     return List.generate(maps.length, (i) {
-      return User.fromMap(maps[i]);
+      return Employee.fromMap(maps[i]);
     });
   }
 
-  Future<List<User>> searchUsers(String query) async {
+  Future<List<Employee>> searchEmployees(String query) async {
     final db = await database;
     final List<Map<String, dynamic>> maps = await db.query(
-      'users',
+      'employees',
       where: 'firstName LIKE ? OR lastName LIKE ? OR address LIKE ?',
       whereArgs: ['%$query%', '%$query%', '%$query%'],
     );
     return List.generate(maps.length, (i) {
-      return User.fromMap(maps[i]);
+      return Employee.fromMap(maps[i]);
     });
   }
 }

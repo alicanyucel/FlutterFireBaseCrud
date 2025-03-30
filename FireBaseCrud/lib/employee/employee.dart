@@ -1,12 +1,16 @@
+import 'package:firebasecrud/services/database.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class Employee extends StatefulWidget {
-  const Employee({super.key});
   @override
   State<Employee> createState() => _EmployeeState();
 }
 
 class _EmployeeState extends State<Employee> {
+  TextEditingController namecontroller=new TextEditingController();
+  TextEditingController lastnamecontroller=new TextEditingController();
+  TextEditingController addresscontroller=new TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -34,7 +38,7 @@ class _EmployeeState extends State<Employee> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
+               Text(
                 "İsim",
                 style: TextStyle(
                   color: Colors.black,
@@ -42,19 +46,20 @@ class _EmployeeState extends State<Employee> {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              const SizedBox(height: 5.0),
+              SizedBox(height: 5.0),
               Container(
                 padding: const EdgeInsets.only(left: 10.0),
                 decoration: BoxDecoration(
                   border: Border.all(),
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: const TextField(
+                child: TextField(
+                  controller: namecontroller,
                   decoration: InputDecoration(border: InputBorder.none),
                 ),
               ),
-              const SizedBox(height: 15.0),
-              const Text(
+              SizedBox(height: 15.0),
+              Text(
                 "Soy İsim",
                 style: TextStyle(
                   color: Colors.black,
@@ -62,19 +67,20 @@ class _EmployeeState extends State<Employee> {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              const SizedBox(height: 5.0),
+              SizedBox(height: 5.0),
               Container(
                 padding: const EdgeInsets.only(left: 10.0),
                 decoration: BoxDecoration(
                   border: Border.all(),
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: const TextField(
+                child: TextField(
+                  controller:lastnamecontroller ,
                   decoration: InputDecoration(border: InputBorder.none),
                 ),
               ),
-              const SizedBox(height: 15.0),
-              const Text(
+              SizedBox(height: 15.0),
+              Text(
                 "Adres",
                 style: TextStyle(
                   color: Colors.black,
@@ -82,21 +88,34 @@ class _EmployeeState extends State<Employee> {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              const SizedBox(height: 5.0),
+              SizedBox(height: 5.0),
               Container(
                 padding: const EdgeInsets.only(left: 10.0),
                 decoration: BoxDecoration(
                   border: Border.all(),
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: const TextField(
+                child:TextField(
+                  controller:addresscontroller,
                   decoration: InputDecoration(border: InputBorder.none),
                 ),
               ),
-              const SizedBox(height: 25.0),
+              SizedBox(height: 25.0),
               Center(
                 child: ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () async {
+                    final employee = EmployeeModel(
+                      firstName: namecontroller.text,
+                      lastName: lastnamecontroller.text,
+                      address: addresscontroller.text,
+                    );
+                    await DatabaseHelper().insertEmployee(employee);
+                    print("Veritabanına eklenen çalışan: ${employee.toMap()}");
+
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Çalışan başarıyla eklendi!')),
+                    );
+                  },
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: const [

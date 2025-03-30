@@ -2,13 +2,13 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'dart:async';
 
-class Employee {
+class EmployeeModel {
   int? id;
   String firstName;
   String lastName;
   String address;
 
-  Employee({this.id, required this.firstName, required this.lastName, required this.address});
+  EmployeeModel({this.id, required this.firstName, required this.lastName, required this.address});
 
   Map<String, dynamic> toMap() {
     return {
@@ -19,8 +19,8 @@ class Employee {
     };
   }
 
-  factory Employee.fromMap(Map<String, dynamic> map) {
-    return Employee(
+  factory EmployeeModel.fromMap(Map<String, dynamic> map) {
+    return EmployeeModel(
       id: map['id'],
       firstName: map['firstName'],
       lastName: map['lastName'],
@@ -51,12 +51,12 @@ class DatabaseHelper {
     });
   }
 
-  Future<void> insertEmployee(Employee employee) async {
+  Future<void> insertEmployee(EmployeeModel employee) async {
     final db = await database;
     await db.insert('employees', employee.toMap(), conflictAlgorithm: ConflictAlgorithm.replace);
   }
 
-  Future<void> updateEmployee(Employee employee) async {
+  Future<void> updateEmployee(EmployeeModel employee) async {
     final db = await database;
     await db.update(
       'employees',
@@ -75,15 +75,15 @@ class DatabaseHelper {
     );
   }
 
-  Future<List<Employee>> getEmployees() async {
+  Future<List<EmployeeModel>> getEmployees() async {
     final db = await database;
     final List<Map<String, dynamic>> maps = await db.query('employees');
     return List.generate(maps.length, (i) {
-      return Employee.fromMap(maps[i]);
+      return EmployeeModel.fromMap(maps[i]);
     });
   }
 
-  Future<List<Employee>> searchEmployees(String query) async {
+  Future<List<EmployeeModel>> searchEmployees(String query) async {
     final db = await database;
     final List<Map<String, dynamic>> maps = await db.query(
       'employees',
@@ -91,7 +91,7 @@ class DatabaseHelper {
       whereArgs: ['%$query%', '%$query%', '%$query%'],
     );
     return List.generate(maps.length, (i) {
-      return Employee.fromMap(maps[i]);
+      return EmployeeModel.fromMap(maps[i]);
     });
   }
 }

@@ -12,9 +12,16 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton:FloatingActionButton(onPressed:(){
-        Navigator.push(context, MaterialPageRoute(builder: (context)=>Employee()));
-      },child:Icon(Icons.add),),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => Employee()),
+          );
+        },
+        icon: Icon(Icons.add),
+        label: Text('Çalışan Kayıt Formu'),
+      ),
       appBar: AppBar(
         title: Row(
           mainAxisAlignment: MainAxisAlignment.center,

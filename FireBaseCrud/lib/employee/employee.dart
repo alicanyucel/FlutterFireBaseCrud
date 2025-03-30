@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 class Employee extends StatefulWidget {
   const Employee({super.key});
-
   @override
   State<Employee> createState() => _EmployeeState();
 }
@@ -56,7 +55,7 @@ class _EmployeeState extends State<Employee> {
               ),
               const SizedBox(height: 15.0),
               const Text(
-                "Yaş",
+                "Soy İsim",
                 style: TextStyle(
                   color: Colors.black,
                   fontSize: 24.0,
@@ -98,15 +97,25 @@ class _EmployeeState extends State<Employee> {
               Center(
                 child: ElevatedButton(
                   onPressed: () {},
-                  child: const Text(
-                    "Ekle",
-                    style: TextStyle(
-                      fontSize: 20.0,
-                      fontWeight: FontWeight.bold,
-                    ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: const [
+                      Icon(
+                        Icons.check_circle,
+                        size: 40.0,
+                      ),
+                      SizedBox(width: 8),
+                      Text(
+                        "Ekle",
+                        style: TextStyle(
+                          fontSize: 20.0,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ),
+              )
             ],
           ),
         ),

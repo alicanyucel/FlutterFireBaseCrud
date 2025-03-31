@@ -22,7 +22,22 @@ class DashboardScreen extends StatelessWidget {
       length: 3,
       child: Scaffold(
         appBar: AppBar(
-          title: Text("Dashboard"),
+          title: Text("Sayım Fişi"),
+          backgroundColor: Colors.red,
+          actions: [
+            IconButton(
+              icon: Icon(Icons.calculate),
+              onPressed: () {
+
+              },
+            ),
+            IconButton(
+              icon: Icon(Icons.home),
+              onPressed: () {
+
+              },
+            ),
+          ],
           bottom: TabBar(
             tabs: [
               Tab(icon: Icon(Icons.search), text: "Arama"),
@@ -64,7 +79,7 @@ class SearchTab extends StatelessWidget {
 }
 
 class ListTab extends StatelessWidget {
-  final List<String> items = List.generate(10, (index) => "Öğe ${index + 1}");
+  final List<String> items = List.generate(10, (index) => "Öğe \${index + 1}");
 
   @override
   Widget build(BuildContext context) {

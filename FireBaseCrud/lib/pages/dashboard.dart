@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-
+import 'package:sqflite/sqflite.dart';
+import 'package:firebasecrud/services/database.dart';
+import 'package:path/path.dart';
 void main() {
   runApp(MyApp());
 }
@@ -68,7 +70,7 @@ class SearchTab extends StatelessWidget {
           TextField(
             decoration: InputDecoration(
               labelText: "Ara",
-              border: OutlineInputBorder(),
+              border:  UnderlineInputBorder(),
               prefixIcon: Icon(Icons.search),
             ),
           ),
@@ -79,21 +81,45 @@ class SearchTab extends StatelessWidget {
 }
 
 class ListTab extends StatelessWidget {
-  final List<String> items = List.generate(10, (index) => "Öğe \${index + 1}");
+  Future<List<EmployeeModel>> getEmployees() async {
+    final dbHelper = DatabaseHelper(); // DatabaseHelper sınıfının bir örneğini oluşturuyoruz
+    final db = await dbHelper.database;
+    final List<Map<String, dynamic>> maps = await db.query('employees');
+    return List.generate(maps.length, (i) {
+      return EmployeeModel.fromMap(maps[i]);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      itemCount: items.length,
-      itemBuilder: (context, index) {
-        return ListTile(
-          leading: Icon(Icons.label),
-          title: Text(items[index]),
-        );
+    return FutureBuilder<List<EmployeeModel>>(
+      future: getEmployees(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return Center(child: Text("Bir hata oluştu: ${snapshot.error}"));
+        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          return Center(child: Text("Veri bulunamadı"));
+        } else {
+          final employees = snapshot.data!;
+          return ListView.builder(
+            itemCount: employees.length,
+            itemBuilder: (context, index) {
+              final employee = employees[index];
+              return ListTile(
+                leading: Icon(Icons.person),
+                title: Text('${employee.firstName} ${employee.lastName}'),
+                subtitle: Text(employee.address),
+              );
+            },
+          );
+        }
       },
     );
   }
 }
+
 
 class SummaryTab extends StatelessWidget {
   @override

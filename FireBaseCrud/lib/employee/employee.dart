@@ -1,3 +1,4 @@
+import 'package:firebasecrud/pages/dashboard.dart';
 import 'package:firebasecrud/services/database.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -115,7 +116,11 @@ class _EmployeeState extends State<Employee> {
                       );
                       await DatabaseHelper().insertEmployee(employee);
                       print("Veritabanına eklenen çalışan: ${employee.toMap()}");
-
+                      // DashboardScreen'e yönlendirme
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => DashboardScreen()),
+                      );
                       Fluttertoast.showToast(
                         msg: "Çalışan başarıyla eklendi!",
                         toastLength: Toast.LENGTH_SHORT,

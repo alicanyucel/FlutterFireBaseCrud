@@ -60,7 +60,38 @@ class DashboardScreen extends StatelessWidget {
   }
 }
 
-class SearchTab extends StatelessWidget {
+class SearchTab extends StatefulWidget {
+  @override
+  _SearchTabState createState() => _SearchTabState();
+}
+
+class _SearchTabState extends State<SearchTab> {
+  List<EmployeeModel> searchResults = [];
+  TextEditingController searchController = TextEditingController();
+
+  Future<void> searchEmployees(String query) async {
+    if (query.isEmpty) {
+      setState(() {
+        searchResults = [];
+      });
+      return;
+    }
+
+    final dbHelper = DatabaseHelper(); // DatabaseHelper sınıfının bir örneğini oluşturuyoruz
+    final db = await dbHelper.database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      'employees',
+      where: 'firstName LIKE ? OR lastName LIKE ? OR address LIKE ?',
+      whereArgs: ['%$query%', '%$query%', '%$query%'],
+    );
+
+    setState(() {
+      searchResults = List.generate(maps.length, (i) {
+        return EmployeeModel.fromMap(maps[i]);
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -68,10 +99,24 @@ class SearchTab extends StatelessWidget {
       child: Column(
         children: [
           TextField(
+            controller: searchController,
+            onChanged: searchEmployees,
             decoration: InputDecoration(
               labelText: "Ara",
-              border:  UnderlineInputBorder(),
+              border: UnderlineInputBorder(),
               prefixIcon: Icon(Icons.search),
+            ),
+          ),
+          Expanded(
+            child: ListView.builder(
+              itemCount: searchResults.length,
+              itemBuilder: (context, index) {
+                final employee = searchResults[index];
+                return ListTile(
+                  title: Text("${employee.firstName} ${employee.lastName}"),
+                  subtitle: Text(employee.address),
+                );
+              },
             ),
           ),
         ],
@@ -79,6 +124,7 @@ class SearchTab extends StatelessWidget {
     );
   }
 }
+
 
 class ListTab extends StatelessWidget {
   Future<List<EmployeeModel>> getEmployees() async {

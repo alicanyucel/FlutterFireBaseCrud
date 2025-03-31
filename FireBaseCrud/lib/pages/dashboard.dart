@@ -124,16 +124,53 @@ class _SearchTabState extends State<SearchTab> {
     );
   }
 }
+class ListTab extends StatefulWidget {
+  @override
+  _ListTabState createState() => _ListTabState();
+}
 
-
-class ListTab extends StatelessWidget {
+class _ListTabState extends State<ListTab> {
   Future<List<EmployeeModel>> getEmployees() async {
-    final dbHelper = DatabaseHelper(); // DatabaseHelper sınıfının bir örneğini oluşturuyoruz
+    final dbHelper = DatabaseHelper();
     final db = await dbHelper.database;
     final List<Map<String, dynamic>> maps = await db.query('employees');
     return List.generate(maps.length, (i) {
       return EmployeeModel.fromMap(maps[i]);
     });
+  }
+
+  Future<void> deleteEmployee(int id) async {
+    final dbHelper = DatabaseHelper();
+    final db = await dbHelper.database;
+    await db.delete('employees', where: 'id = ?', whereArgs: [id]);
+  }
+
+  void _showDeleteDialog(BuildContext context, int id, String fullName) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Silme Onayı"),
+          content: Text("$fullName adlı çalışanı silmek istiyor musunuz?"),
+          actions: <Widget>[
+            TextButton(
+              child: Text("Hayır"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text("Evet"),
+              onPressed: () async {
+                Navigator.of(context).pop();
+                await deleteEmployee(id);
+                setState(() {});
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -157,6 +194,29 @@ class ListTab extends StatelessWidget {
                 leading: Icon(Icons.person),
                 title: Text('${employee.firstName} ${employee.lastName}'),
                 subtitle: Text(employee.address),
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      icon: Icon(Icons.delete, color: Colors.red),
+                      tooltip: 'Sil',
+                      onPressed: () {
+                        _showDeleteDialog(
+                          context,
+                          employee.id!,
+                          '${employee.firstName} ${employee.lastName}',
+                        );
+                      },
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.refresh, color: Colors.blue),
+                      tooltip: 'Yenile',
+                      onPressed: () {
+                        setState(() {});
+                      },
+                    ),
+                  ],
+                ),
               );
             },
           );

@@ -4,3 +4,4 @@ Güncelleme
 ekleme,listeleme,arama ve toplama işlemi yapıdlı apk eklendi.
 silme ve güncelleme kaldı
 verit abanı sonra değiştirilecek
+Porje bİTTİ

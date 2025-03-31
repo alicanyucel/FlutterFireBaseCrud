@@ -42,7 +42,7 @@ class DashboardScreen extends StatelessWidget {
           ],
           bottom: TabBar(
             tabs: [
-              Tab(icon: Icon(Icons.search), text: "Arama"),
+              Tab(icon: Icon(Icons.search), text: "Ürün Ara"),
               Tab(icon: Icon(Icons.list), text: "Liste"),
               Tab(icon: Icon(Icons.summarize), text: "Toplam"),
             ],
@@ -168,10 +168,32 @@ class ListTab extends StatelessWidget {
 
 
 class SummaryTab extends StatelessWidget {
+  Future<int> getEmployeeCount() async {
+    final dbHelper = DatabaseHelper();
+    final db = await dbHelper.database;
+    // çalışan sayısını bulan sql sorgum
+    final result = await db.rawQuery('SELECT COUNT(*) as count FROM employees');
+    return result.isNotEmpty ? result.first['count'] as int : 0;
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Text("Toplama Sayfası İçeriği", style: TextStyle(fontSize: 20)),
+    return FutureBuilder<int>(
+      future: getEmployeeCount(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return Center(child: Text('Hata: ${snapshot.error}'));
+        } else {
+          return Center(
+            child: Text(
+              "Çalışan Sayısı: ${snapshot.data}",
+              style: TextStyle(fontSize: 20),
+            ),
+          );
+        }
+      },
     );
   }
 }

@@ -3,12 +3,12 @@ import 'package:firebasecrud/services/database.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
-class Employee extends StatefulWidget {
+class Product extends StatefulWidget {
   @override
-  State<Employee> createState() => _EmployeeState();
+  State<Product> createState() => _ProductState();
 }
 
-class _EmployeeState extends State<Employee> {
+class _ProductState extends State<Product> {
   final _formKey = GlobalKey<FormState>();
   TextEditingController materialNameController = TextEditingController();
   TextEditingController stockCodeController = TextEditingController();

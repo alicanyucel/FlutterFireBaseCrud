@@ -16,7 +16,7 @@ class _HomeState extends State<Home> {
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => Employee()),
+            MaterialPageRoute(builder: (context) => Product()),
           );
         },
         icon: Icon(Icons.add),

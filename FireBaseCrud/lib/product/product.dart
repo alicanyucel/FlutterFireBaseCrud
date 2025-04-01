@@ -36,7 +36,7 @@ class _EmployeeState extends State<Employee> {
               children: [
                 buildTextField("Ürün Adı", materialNameController, "Ürün adını giriniz"),
                 buildTextField("Stok Kodu", stockCodeController, "Stok kodunu giriniz"),
-                buildTextField("Adet", quantityController, "Adet giriniz", isNumeric: true),
+                buildTextField("Adet", quantityController, "Adet giriniz", isNumeric: true, isQuantity: true),
                 const SizedBox(height: 25.0),
                 Center(
                   child: ElevatedButton(
@@ -49,7 +49,7 @@ class _EmployeeState extends State<Employee> {
                             quantity: int.tryParse(quantityController.text) ?? 0,
                           );
                           await DatabaseHelper().insertProduct(product);
-                          print("Veritabanına eklenen ürün: ${product.toMap()}");
+                          print("Veritabanına eklenen ürün: \${product.toMap()}");
                           Navigator.push(
                             context,
                             MaterialPageRoute(builder: (context) => DashboardScreen()),
@@ -63,7 +63,7 @@ class _EmployeeState extends State<Employee> {
                           );
                         } catch (e) {
                           Fluttertoast.showToast(
-                            msg: "Bir hata oluştu: $e",
+                            msg: "Bir hata oluştu: \$e",
                             toastLength: Toast.LENGTH_LONG,
                             gravity: ToastGravity.BOTTOM,
                             backgroundColor: Colors.red,
@@ -90,7 +90,7 @@ class _EmployeeState extends State<Employee> {
     );
   }
 
-  Widget buildTextField(String label, TextEditingController controller, String hintText, {bool isNumeric = false}) {
+  Widget buildTextField(String label, TextEditingController controller, String hintText, {bool isNumeric = false, bool isQuantity = false}) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 15.0),
       child: Column(
@@ -112,6 +112,12 @@ class _EmployeeState extends State<Employee> {
             validator: (value) {
               if (value == null || value.trim().isEmpty) {
                 return "$label boş bırakılamaz";
+              }
+              if (isQuantity) {
+                final int? number = int.tryParse(value);
+                if (number == null || number <= 0) {
+                  return "$label 0'dan büyük bir sayı olmalıdır";
+                }
               }
               return null;
             },

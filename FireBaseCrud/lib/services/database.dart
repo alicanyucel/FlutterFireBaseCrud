@@ -2,29 +2,29 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'dart:async';
 
-class EmployeeModel {
+class ProductModel {
   int? id;
-  String firstName;
-  String lastName;
-  String address;
+  String materialName;
+  String stockCode;
+  int quantity;
 
-  EmployeeModel({this.id, required this.firstName, required this.lastName, required this.address});
+  ProductModel({this.id, required this.materialName, required this.stockCode, required this.quantity});
 
   Map<String, dynamic> toMap() {
     return {
       'id': id,
-      'firstName': firstName,
-      'lastName': lastName,
-      'address': address,
+      'materialName': materialName,
+      'stockCode': stockCode,
+      'quantity': quantity,
     };
   }
 
-  factory EmployeeModel.fromMap(Map<String, dynamic> map) {
-    return EmployeeModel(
+  factory ProductModel.fromMap(Map<String, dynamic> map) {
+    return ProductModel(
       id: map['id'],
-      firstName: map['firstName'],
-      lastName: map['lastName'],
-      address: map['address'],
+      materialName: map['materialName'],
+      stockCode: map['stockCode'],
+      quantity: map['quantity'],
     );
   }
 }
@@ -43,60 +43,61 @@ class DatabaseHelper {
   }
 
   Future<Database> _initDB() async {
-    final path = join(await getDatabasesPath(), 'employee_database.db');
+    final path = join(await getDatabasesPath(), 'product_database.db');
     return await openDatabase(path, version: 1, onCreate: (db, version) {
       return db.execute(
-        'CREATE TABLE employees(id INTEGER PRIMARY KEY AUTOINCREMENT, firstName TEXT, lastName TEXT, address TEXT)',
+          'CREATE TABLE products(id INTEGER PRIMARY KEY AUTOINCREMENT, materialName TEXT, stockCode TEXT, quantity INTEGER)'
       );
     });
   }
 
-  Future<void> insertEmployee(EmployeeModel employee) async {
+  Future<void> insertProduct(ProductModel product) async {
     final db = await database;
-    await db.insert('employees', employee.toMap(), conflictAlgorithm: ConflictAlgorithm.replace);
+    await db.insert('products', product.toMap(), conflictAlgorithm: ConflictAlgorithm.replace);
   }
 
-  Future<void> updateEmployee(EmployeeModel employee) async {
+  Future<void> updateProduct(ProductModel product) async {
     final db = await database;
     await db.update(
-      'employees',
-      employee.toMap(),
+      'products',
+      product.toMap(),
       where: 'id = ?',
-      whereArgs: [employee.id],
+      whereArgs: [product.id],
     );
   }
 
-  Future<void> deleteEmployee(int id) async {
+  Future<void> deleteProduct(int id) async {
     final db = await database;
     await db.delete(
-      'employees',
+      'products',
       where: 'id = ?',
       whereArgs: [id],
     );
   }
-  Future<int> getEmployeeCount() async {
+
+  Future<int> getProductCount() async {
     final db = await database;
-    final result = await db.rawQuery('SELECT COUNT(*) as count FROM employees');
+    final result = await db.rawQuery('SELECT COUNT(*) as count FROM products');
     return Sqflite.firstIntValue(result) ?? 0;
   }
 
-  Future<List<EmployeeModel>> getEmployees() async {
+  Future<List<ProductModel>> getProducts() async {
     final db = await database;
-    final List<Map<String, dynamic>> maps = await db.query('employees');
+    final List<Map<String, dynamic>> maps = await db.query('products');
     return List.generate(maps.length, (i) {
-      return EmployeeModel.fromMap(maps[i]);
+      return ProductModel.fromMap(maps[i]);
     });
   }
 
-  Future<List<EmployeeModel>> searchEmployees(String query) async {
+  Future<List<ProductModel>> searchProducts(String query) async {
     final db = await database;
     final List<Map<String, dynamic>> maps = await db.query(
-      'employees',
-      where: 'firstName LIKE ? OR lastName LIKE ? OR address LIKE ?',
-      whereArgs: ['%$query%', '%$query%', '%$query%'],
+      'products',
+      where: 'materialName LIKE ? OR stockCode LIKE ?',
+      whereArgs: ['%$query%', '%$query%'],
     );
     return List.generate(maps.length, (i) {
-      return EmployeeModel.fromMap(maps[i]);
+      return ProductModel.fromMap(maps[i]);
     });
   }
 }

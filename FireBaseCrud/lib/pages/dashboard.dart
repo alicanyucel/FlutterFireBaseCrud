@@ -104,7 +104,6 @@ class _SearchTabState extends State<SearchTab> {
             decoration: InputDecoration(
               labelText: "Ara",
               border: UnderlineInputBorder(),
-              prefixIcon: Icon(Icons.search),
             ),
           ),
           Expanded(
@@ -191,14 +190,14 @@ class _ListTabState extends State<ListTab> {
             itemBuilder: (context, index) {
               final employee = employees[index];
               return ListTile(
-                leading: Icon(Icons.person),
+                leading: Icon(Icons.shopping_bag),
                 title: Text('${employee.firstName} ${employee.lastName}'),
                 subtitle: Text(employee.address),
                 trailing: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     IconButton(
-                      icon: Icon(Icons.delete, color: Colors.red),
+                      icon: Icon(Icons.close, color: Colors.red),
                       tooltip: 'Sil',
                       onPressed: () {
                         _showDeleteDialog(

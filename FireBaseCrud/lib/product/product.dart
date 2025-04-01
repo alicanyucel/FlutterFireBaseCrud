@@ -10,9 +10,9 @@ class Employee extends StatefulWidget {
 }
 
 class _EmployeeState extends State<Employee> {
-  TextEditingController namecontroller = TextEditingController();
-  TextEditingController lastnamecontroller = TextEditingController();
-  TextEditingController addresscontroller = TextEditingController();
+  TextEditingController materialnamecontroller = TextEditingController();
+  TextEditingController stockcodecontroller = TextEditingController();
+  TextEditingController quantitycontroller = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +22,7 @@ class _EmployeeState extends State<Employee> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              "Çalışan Kayıt Formu",
+              "Ürün Kayıt Formu",
               style: TextStyle(
                 color: Colors.blue,
                 fontSize: 24.0,
@@ -43,7 +43,7 @@ class _EmployeeState extends State<Employee> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                "İsim",
+                "Ürün Adı",
                 style: TextStyle(
                   color: Colors.black,
                   fontSize: 24.0,
@@ -58,13 +58,13 @@ class _EmployeeState extends State<Employee> {
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: TextField(
-                  controller: namecontroller,
+                  controller: materialnamecontroller,
                   decoration: InputDecoration(border: InputBorder.none),
                 ),
               ),
               SizedBox(height: 15.0),
               Text(
-                "Soy İsim",
+                "Stok Kodu",
                 style: TextStyle(
                   color: Colors.black,
                   fontSize: 24.0,
@@ -79,13 +79,13 @@ class _EmployeeState extends State<Employee> {
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: TextField(
-                  controller: lastnamecontroller,
+                  controller: stockcodecontroller,
                   decoration: InputDecoration(border: InputBorder.none),
                 ),
               ),
               SizedBox(height: 15.0),
               Text(
-                "Adres",
+                "Adet",
                 style: TextStyle(
                   color: Colors.black,
                   fontSize: 24.0,
@@ -100,7 +100,7 @@ class _EmployeeState extends State<Employee> {
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: TextField(
-                  controller: addresscontroller,
+                  controller: quantitycontroller,
                   decoration: InputDecoration(border: InputBorder.none),
                 ),
               ),
@@ -109,20 +109,20 @@ class _EmployeeState extends State<Employee> {
                 child: ElevatedButton(
                   onPressed: () async {
                     try {
-                      final employee = EmployeeModel(
-                        firstName: namecontroller.text,
-                        lastName: lastnamecontroller.text,
-                        address: addresscontroller.text,
+                      final product =ProductModel(
+                        materialName: materialnamecontroller.text,
+                        stockCode: stockcodecontroller.text,
+                        quantity:  int.tryParse(quantitycontroller.text) ?? 0,
                       );
-                      await DatabaseHelper().insertEmployee(employee);
-                      print("Veritabanına eklenen çalışan: ${employee.toMap()}");
+                      await DatabaseHelper().insertProduct(product);
+                      print("Veritabanına eklenen ürün: ${product.toMap()}");
                       // DashboardScreen'e yönlendirme
                       Navigator.push(
                         context,
                         MaterialPageRoute(builder: (context) => DashboardScreen()),
                       );
                       Fluttertoast.showToast(
-                        msg: "Çalışan başarıyla eklendi!",
+                        msg: "Ürün başarıyla eklendi!",
                         toastLength: Toast.LENGTH_SHORT,
                         gravity: ToastGravity.BOTTOM,
                         timeInSecForIosWeb: 1,

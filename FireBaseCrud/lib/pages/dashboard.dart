@@ -66,10 +66,10 @@ class SearchTab extends StatefulWidget {
 }
 
 class _SearchTabState extends State<SearchTab> {
-  List<EmployeeModel> searchResults = [];
+  List<ProductModel> searchResults = [];
   TextEditingController searchController = TextEditingController();
 
-  Future<void> searchEmployees(String query) async {
+  Future<void> searchProducts(String query) async {
     if (query.isEmpty) {
       setState(() {
         searchResults = [];
@@ -79,16 +79,15 @@ class _SearchTabState extends State<SearchTab> {
 
     final dbHelper = DatabaseHelper(); // DatabaseHelper sınıfının bir örneğini oluşturuyoruz
     final db = await dbHelper.database;
+
     final List<Map<String, dynamic>> maps = await db.query(
-      'employees',
-      where: 'firstName LIKE ? OR lastName LIKE ? OR address LIKE ?',
-      whereArgs: ['%$query%', '%$query%', '%$query%'],
+      'products',
+      where: 'materialName LIKE ? OR stockCode LIKE ?',
+      whereArgs: ['%$query%', '%$query%'],
     );
 
     setState(() {
-      searchResults = List.generate(maps.length, (i) {
-        return EmployeeModel.fromMap(maps[i]);
-      });
+      searchResults = maps.map((map) => ProductModel.fromMap(map)).toList();
     });
   }
 
@@ -100,8 +99,8 @@ class _SearchTabState extends State<SearchTab> {
         children: [
           TextField(
             controller: searchController,
-            onChanged: searchEmployees,
-            decoration: InputDecoration(
+            onChanged: searchProducts,
+            decoration: const InputDecoration(
               labelText: "Ara",
               border: UnderlineInputBorder(),
             ),
@@ -110,10 +109,11 @@ class _SearchTabState extends State<SearchTab> {
             child: ListView.builder(
               itemCount: searchResults.length,
               itemBuilder: (context, index) {
-                final employee = searchResults[index];
+                final product = searchResults[index];
                 return ListTile(
-                  title: Text("${employee.firstName} ${employee.lastName}"),
-                  subtitle: Text(employee.address),
+                  title: Text("Ürün Adı ${product.materialName} Stok Kodu (${product.stockCode})"),
+                  subtitle: Text("Adet: ${product.quantity}"),
+                 
                 );
               },
             ),
@@ -123,25 +123,27 @@ class _SearchTabState extends State<SearchTab> {
     );
   }
 }
+
 class ListTab extends StatefulWidget {
   @override
   _ListTabState createState() => _ListTabState();
 }
 
+
 class _ListTabState extends State<ListTab> {
-  Future<List<EmployeeModel>> getEmployees() async {
+  Future<List<ProductModel>> getProduct() async {
     final dbHelper = DatabaseHelper();
     final db = await dbHelper.database;
-    final List<Map<String, dynamic>> maps = await db.query('employees');
+    final List<Map<String, dynamic>> maps = await db.query('products');
     return List.generate(maps.length, (i) {
-      return EmployeeModel.fromMap(maps[i]);
+      return ProductModel.fromMap(maps[i]);
     });
   }
 
-  Future<void> deleteEmployee(int id) async {
+  Future<void> deleteProducts(int id) async {
     final dbHelper = DatabaseHelper();
     final db = await dbHelper.database;
-    await db.delete('employees', where: 'id = ?', whereArgs: [id]);
+    await db.delete('products', where: 'id = ?', whereArgs: [id]);
   }
 
   void _showDeleteDialog(BuildContext context, int id, String fullName) {
@@ -150,7 +152,7 @@ class _ListTabState extends State<ListTab> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text("Silme Onayı"),
-          content: Text("$fullName adlı çalışanı silmek istiyor musunuz?"),
+          content: Text("$fullName adlı ürünü silmek istiyor musunuz?"),
           actions: <Widget>[
             TextButton(
               child: Text("Hayır"),
@@ -162,7 +164,7 @@ class _ListTabState extends State<ListTab> {
               child: Text("Evet"),
               onPressed: () async {
                 Navigator.of(context).pop();
-                await deleteEmployee(id);
+                await deleteProducts(id);
                 setState(() {});
               },
             ),
@@ -174,52 +176,68 @@ class _ListTabState extends State<ListTab> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<EmployeeModel>>(
-      future: getEmployees(),
+    return FutureBuilder<List<ProductModel>>(
+      future: getProduct(),
       builder: (context, snapshot) {
+
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(child: CircularProgressIndicator());
-        } else if (snapshot.hasError) {
-          return Center(child: Text("Bir hata oluştu: ${snapshot.error}"));
-        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-          return Center(child: Text("Veri bulunamadı"));
-        } else {
-          final employees = snapshot.data!;
-          return ListView.builder(
-            itemCount: employees.length,
-            itemBuilder: (context, index) {
-              final employee = employees[index];
-              return ListTile(
-                leading: Icon(Icons.shopping_bag),
-                title: Text('${employee.firstName} ${employee.lastName}'),
-                subtitle: Text(employee.address),
-                trailing: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    IconButton(
-                      icon: Icon(Icons.close, color: Colors.red),
-                      tooltip: 'Sil',
-                      onPressed: () {
-                        _showDeleteDialog(
-                          context,
-                          employee.id!,
-                          '${employee.firstName} ${employee.lastName}',
-                        );
-                      },
-                    ),
-                    IconButton(
-                      icon: Icon(Icons.refresh, color: Colors.blue),
-                      tooltip: 'Yenile',
-                      onPressed: () {
-                        setState(() {});
-                      },
-                    ),
-                  ],
-                ),
-              );
-            },
-          );
         }
+
+        if (snapshot.hasError) {
+          return Center(child: Text("Bir hata oluştu: ${snapshot.error}"));
+        }
+        if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          return Center(child: Text("Veri bulunamadı"));
+        }
+
+        final products = snapshot.data!;
+
+        return ListView.builder(
+          itemCount: products.length,
+          itemBuilder: (context, index) {
+            final product = products[index];
+            return ListTile(
+              leading: Icon(Icons.shopping_bag),
+              title: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Stok Kodu: ${product.stockCode}'),
+                  Text(
+                    'Ürün Adı: ${product.materialName}',
+                    style: TextStyle(color: Colors.red),
+                  ),
+                  Text('Adet: ${product.quantity}'),
+                ],
+              ),
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Silme butonu
+                  IconButton(
+                    icon: Icon(Icons.close, color: Colors.red),
+                    tooltip: 'Sil',
+                    onPressed: () {
+                      _showDeleteDialog(
+                        context,
+                        product.id!,
+                        '${product.materialName} ${product.stockCode}',
+                      );
+                    },
+                  ),
+
+                  IconButton(
+                    icon: Icon(Icons.refresh, color: Colors.blue),
+                    tooltip: 'Yenile',
+                    onPressed: () {
+                      setState(() {});
+                    },
+                  ),
+                ],
+              ),
+            );
+          },
+        );
       },
     );
   }
@@ -227,28 +245,29 @@ class _ListTabState extends State<ListTab> {
 
 
 class SummaryTab extends StatelessWidget {
-  Future<int> getEmployeeCount() async {
+  Future<int> getProductCount() async {
     final dbHelper = DatabaseHelper();
     final db = await dbHelper.database;
-    // çalışan sayısını bulan sql sorgum
-    final result = await db.rawQuery('SELECT COUNT(*) as count FROM employees');
-    return result.isNotEmpty ? result.first['count'] as int : 0;
+    final result = await db.rawQuery('SELECT SUM(quantity) as totalQuantity FROM products;');
+    return result.isNotEmpty && result.first['totalQuantity'] != null
+        ? result.first['totalQuantity'] as int
+        : 0;
   }
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<int>(
-      future: getEmployeeCount(),
+      future: getProductCount(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(child: CircularProgressIndicator());
         } else if (snapshot.hasError) {
-          return Center(child: Text('Hata: ${snapshot.error}'));
+          return Center(child: Text("Hata: ${snapshot.error}"));
         } else {
           return Center(
             child: Text(
-              "Çalışan Sayısı: ${snapshot.data}",
-              style: TextStyle(fontSize: 20),
+              "Toplam Ürün Miktarı: ${snapshot.data}",
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
           );
         }
@@ -256,3 +275,4 @@ class SummaryTab extends StatelessWidget {
     );
   }
 }
+

@@ -1,4 +1,4 @@
-import 'package:firebasecrud/employee/employee.dart';
+import 'package:firebasecrud/product/product.dart';
 import 'package:flutter/material.dart';
 
 class Home extends StatefulWidget {
